@@ -203,6 +203,49 @@ Em caso de conflito com os arquivos 04, 05 e 08, vale este diário.
 - manifest.csv (LF): 120 linhas, sem campos vazios · SHA-256 07fb82c56ddd4520667bb24d224a8e1e8335ef96128c431715943c31b215bb1b
 - Reprodutibilidade: segunda execução gerou manifest.csv idêntico
 
+## Reanálise de sensibilidade ao limiar 0,99 (D-12)
+- Data: 11/11/2026 · Responsável: Jonmar · Registro posterior à execução do experimento
+- Motivo: a banca apontou 17,8% de falsos positivos (16 de 90) nas capas PNG limpas com o limiar
+  0,95; a D-12 pré-registra 0,99 como único ajuste permitido. Objetivo: medir o efeito desse limiar
+  sobre FP, FN e o teste principal sem refazer a coleta
+- Gatilho da D-12 no piloto (resultados/piloto/limpas.csv): PNG 8 de 30 FP com 0,95 (acima de 3);
+  com 0,99 ainda seriam 6 de 30. JPEG 0 de 30 nos dois limiares
+- Método: só reclassificação. O p_max contínuo já gravado pela coleta é comparado com cada limiar
+  (detectado/FP se p_max ≥ limiar, regra da D-12). Nada foi re-medido (tempo, CPU, memória e
+  qualidade não dependem do limiar), nenhuma imagem foi aberta e o p_max não foi recalculado, então
+  seed e ordem de janelas (D-18) são as da coleta. IC de Wilson, McNemar exato e BH na família de
+  detecção vêm de src/estatistica.py, como em analise.py
+- Script: scripts/reanalise_limiar.py (recusa gravar em resultados/experimento/)
+- Fonte: resultados.csv (540 linhas) e limpas.csv (180 linhas) da coleta, commit a8ef486, fora do
+  Git (C:\Faculdade TCC\Resultados; tag dados-v1 ainda não criada)
+  - SHA-256 resultados.csv 12da2baf74be36774113af828197238d6f27df42147fdc3ac6c27a077f980022
+  - SHA-256 limpas.csv 67b4112daf792b855f3c5a219263fe032b75b17b94a1c623c629bc18b7b4d3d4
+  - Nenhum p_max nan nas duas tabelas
+- Saída: resultados/experimento_lim099/ (tabela_fp/fn/deteccao_lim099.csv, comparativo_limiar_lim099.csv/.md,
+  comparativo_mcnemar_lim099.csv, proveniencia_lim099.json); cada tabela traz os dois limiares
+- Conferência: com 0,95 a reanálise reproduz exatamente tabela_fn.csv, tabela_fp.csv e
+  tabela_deteccao.csv da coleta
+- Ambiente: fora da VM (como no DESVIO-01), Windows 10, Python 3.12.3, numpy 2.5.4, pandas 3.0.6,
+  scipy 1.18.1, statsmodels 0.15.0
+- Resultado — capas limpas (FP, IC 95% de Wilson):
+  - PNG: 16/90 = 17,8% [11,2%; 26,9%] → 12/90 = 13,3% [7,8%; 21,9%]
+  - JPEG: 0/90 = 0,0% [0,0%; 4,1%] nos dois limiares
+  - Das 16 capas PNG marcadas com 0,95, 10 têm p_max ≥ 0,999 e 2 chegam a 1,000; 9 são de textura
+    alta, 6 de média e 1 de baixa
+- Resultado — estego (sensibilidade 0,95 → 0,99):
+  - PNG/LSB: baixa 31,1% → 21,1% · média 82,2% → 65,6% · alta 83,3% → 72,2% · agregado 65,6% → 53,0%
+  - JPEG/DCT: baixa 35,6% → 10,0% · média 86,7% → 62,2% · alta 93,3% → 76,7% · agregado 71,9% → 49,6%
+  - Especificidade: PNG 82,2% → 86,7%; JPEG 100% nos dois
+- Resultado — McNemar LSB × DCT (pares discordantes só LSB × só DCT; p ajustado por BH):
+  - 0,95: baixa 9 × 13 (p_BH 0,557) · média 11 × 15 (0,557) · alta 5 × 14 (0,191)
+  - 0,99: baixa 17 × 7 (0,192) · média 22 × 19 (0,755) · alta 15 × 19 (0,755)
+- Conclusão: o 0,99 não leva o FP em PNG a um nível aceitável (o limite inferior do IC segue acima
+  de 5%) e o FP restante não se resolve com limiar, pois várias capas limpas têm p_max ≈ 1. O custo é
+  de 12,6 p.p. de sensibilidade no PNG e de 22,2 p.p. no JPEG, que não tinha FP a reduzir. Nenhuma
+  diferença LSB × DCT é significativa em nenhum dos limiares; a direção pontual muda (com 0,95 a DCT
+  é a mais detectada nas três taxas; com 0,99 o LSB passa à frente nas taxas baixa e média)
+- Esta reanálise não define o limiar final da T2.2; ela é a análise de sensibilidade ao limiar
+
 ## Desvios
 (modelo: data · o que o protocolo previa · o que foi observado · o que foi adotado · quem aprovou)
 
