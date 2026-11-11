@@ -1,0 +1,35 @@
+{
+  "gerado_em": "2026-11-11T15:19:58.855767+00:00",
+  "script": "scripts/reanalise_limiar.py",
+  "commit_repositorio": "4ab4a357a45222feb9c95a01fb234fe261184efe",
+  "arvore_suja_src_scripts": false,
+  "fonte": "C:\\Faculdade TCC\\Resultados",
+  "commit_coleta": [
+    "a8ef486b9ca8c77c2e7f0efc53856d5527879d8f"
+  ],
+  "sha256_fonte": {
+    "resultados.csv": "12da2baf74be36774113af828197238d6f27df42147fdc3ac6c27a077f980022",
+    "limpas.csv": "67b4112daf792b855f3c5a219263fe032b75b17b94a1c623c629bc18b7b4d3d4"
+  },
+  "limiares": [
+    0.95,
+    0.99
+  ],
+  "regra": "detectado/FP se p_max >= limiar (D-12)",
+  "p_max_nan": {
+    "resultados.csv": 0,
+    "limpas.csv": 0
+  },
+  "reproduz_coleta_com_0_95": {
+    "tabela_fn.csv": true,
+    "tabela_fp.csv": true,
+    "tabela_deteccao.csv": true,
+    "limpas.csv: falso_positivo == p_max >= 0.95": true
+  },
+  "versoes": {
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "scipy": "1.18.1",
+    "statsmodels": "0.15.0"
+  }
+}
