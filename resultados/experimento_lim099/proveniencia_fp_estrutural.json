@@ -1,0 +1,113 @@
+{
+  "gerado_em": "2026-11-11T16:24:28.495364+00:00",
+  "script": "scripts/fp_estrutural.py",
+  "commit_repositorio": "3ce60ebb46fedacccc7af59676d01fb17df90c44",
+  "arvore_suja_src_scripts": false,
+  "fonte": "C:\\Faculdade TCC\\Resultados",
+  "sha256_limpas.csv": "67b4112daf792b855f3c5a219263fe032b75b17b94a1c623c629bc18b7b4d3d4",
+  "commit_coleta": [
+    "a8ef486b9ca8c77c2e7f0efc53856d5527879d8f"
+  ],
+  "commit_coleta_origem": "resultados.csv (coluna commit)",
+  "sha256_resultados.csv": "12da2baf74be36774113af828197238d6f27df42147fdc3ac6c27a077f980022",
+  "regra": "FP se p_max >= limiar (D-12); '1,0 estrito' = p_max >= 1,0",
+  "limiares_candidatos": [
+    0.95,
+    0.99,
+    0.999,
+    0.9999,
+    1.0
+  ],
+  "nivel_aceitavel": 0.05,
+  "criterios_aceitavel": {
+    "ponto": "taxa de FP ≤ 5%",
+    "ic_inf": "limite inferior do IC ≤ 5% (não é maior que 5%)",
+    "ic_sup": "limite superior do IC ≤ 5% (comprovadamente ≤ 5%)"
+  },
+  "faixas": [
+    [
+      "<0,95",
+      -Infinity,
+      0.95
+    ],
+    [
+      "[0,95; 0,99)",
+      0.95,
+      0.99
+    ],
+    [
+      "[0,99; 0,999)",
+      0.99,
+      0.999
+    ],
+    [
+      "[0,999; 0,99999)",
+      0.999,
+      0.99999
+    ],
+    [
+      "≈1,000 (≥0,99999)",
+      0.99999,
+      Infinity
+    ]
+  ],
+  "faixa_topo": "p_max >= 0.99999 tratado como 1,000",
+  "ic": "Wilson 95% (taxa_com_ic, src/estatistica.py)",
+  "n_capas": {
+    "jpeg": 90,
+    "png": 90
+  },
+  "n_estego": {
+    "jpeg": 270,
+    "png": 270
+  },
+  "p_max_nan_estego": 0,
+  "limiares_custo": [
+    [
+      "0,95",
+      0.95
+    ],
+    [
+      "0,99",
+      0.99
+    ],
+    [
+      "0,999",
+      0.999
+    ],
+    [
+      "mínimo PNG (ic_inf)",
+      0.9996822702220352
+    ],
+    [
+      "0,9999",
+      0.9999
+    ],
+    [
+      "mínimo PNG (ponto)",
+      0.9999867260976176
+    ],
+    [
+      "mínimo PNG (ic_sup)",
+      0.9999999542096293
+    ],
+    [
+      "1,0 (estrito)",
+      1.0
+    ]
+  ],
+  "regra_limiar_minimo_concreto": "L = p_(k) (k-ésimo maior p_max PNG limpo) ou, para k = 0, nextafter(max, +inf)",
+  "regra_deteccao": "detectado se p_max >= L; nan => não detectado",
+  "ic_agregado": "agregado = 270 estego (3 taxas × 90 imagens) tratadas como independentes (aproximação)",
+  "confere_reanalise_limiar": {
+    "sensibilidade 0,95/0,99 == tabela_fn_lim099.csv": true
+  },
+  "python": "3.12.3",
+  "sistema": "Windows-10-10.0.19045-SP0",
+  "versoes": {
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "scipy": "1.18.1",
+    "statsmodels": "0.15.0"
+  }
+}

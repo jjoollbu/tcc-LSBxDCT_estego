@@ -230,8 +230,10 @@ Em caso de conflito com os arquivos 04, 05 e 08, vale este diário.
 - Resultado — capas limpas (FP, IC 95% de Wilson):
   - PNG: 16/90 = 17,8% [11,2%; 26,9%] → 12/90 = 13,3% [7,8%; 21,9%]
   - JPEG: 0/90 = 0,0% [0,0%; 4,1%] nos dois limiares
-  - Das 16 capas PNG marcadas com 0,95, 10 têm p_max ≥ 0,999 e 2 chegam a 1,000; 9 são de textura
-    alta, 6 de média e 1 de baixa
+  - Das 16 capas PNG marcadas com 0,95, 10 têm p_max ≥ 0,999 e 3 têm p_max ≥ 0,99999 (máximo
+    0,9999999542); nenhuma tem p_max = 1 exato; 9 são de textura alta, 6 de média e 1 de baixa
+    (corrigido em 11/11/2026: o registro anterior dizia "2 chegam a 1,000", valor arredondado; ver
+    seção "Análise do FP estrutural em PNG")
 - Resultado — estego (sensibilidade 0,95 → 0,99):
   - PNG/LSB: baixa 31,1% → 21,1% · média 82,2% → 65,6% · alta 83,3% → 72,2% · agregado 65,6% → 53,0%
   - JPEG/DCT: baixa 35,6% → 10,0% · média 86,7% → 62,2% · alta 93,3% → 76,7% · agregado 71,9% → 49,6%
@@ -240,11 +242,47 @@ Em caso de conflito com os arquivos 04, 05 e 08, vale este diário.
   - 0,95: baixa 9 × 13 (p_BH 0,557) · média 11 × 15 (0,557) · alta 5 × 14 (0,191)
   - 0,99: baixa 17 × 7 (0,192) · média 22 × 19 (0,755) · alta 15 × 19 (0,755)
 - Conclusão: o 0,99 não leva o FP em PNG a um nível aceitável (o limite inferior do IC segue acima
-  de 5%) e o FP restante não se resolve com limiar, pois várias capas limpas têm p_max ≈ 1. O custo é
+  de 5%), e o FP restante só cai a ≤ 5% com limiares colados em 1, que derrubam a detecção (ver
+  seção "Análise do FP estrutural em PNG"; corrigido em 11/11/2026: o registro anterior atribuía isso
+  a capas limpas com p_max ≈ 1, o que não se confirma com o valor exato). O custo do 0,99 é
   de 12,6 p.p. de sensibilidade no PNG e de 22,2 p.p. no JPEG, que não tinha FP a reduzir. Nenhuma
   diferença LSB × DCT é significativa em nenhum dos limiares; a direção pontual muda (com 0,95 a DCT
   é a mais detectada nas três taxas; com 0,99 o LSB passa à frente nas taxas baixa e média)
 - Esta reanálise não define o limiar final da T2.2; ela é a análise de sensibilidade ao limiar
+
+## Análise do FP estrutural em PNG
+- Data: 11/11/2026 · Responsável: Jonmar · Registro posterior à execução do experimento
+- Pergunta: o FP em PNG se resolve com algum limiar < 1 (problema de calibração) ou não (problema
+  estrutural)?
+- Método: só leitura do p_max já gravado (regra da D-12: FP/detectado se p_max ≥ L). Distribuição
+  do p_max das capas limpas por faixa e por textura; FP nos limiares 0,95 · 0,99 · 0,999 · 0,9999 ·
+  1,0 (estrito, p_max ≥ 1); menor limiar < 1 com FP ≤ 5% (pela taxa pontual e pelos dois limites
+  do IC); detecção das estego nesses mesmos limiares. Nada foi re-medido e nenhuma imagem foi aberta.
+  IC de Wilson de src/estatistica.py
+- Script: scripts/fp_estrutural.py (recusa gravar em resultados/experimento/)
+- Fonte: limpas.csv e resultados.csv da coleta (commit a8ef486), os mesmos SHA-256 da seção anterior
+- Saída: resultados/experimento_lim099/ (fp_estrutural.csv, fp_estrutural.md,
+  proveniencia_fp_estrutural.json)
+- Conferência: com 0,95 e 0,99 a sensibilidade reproduz exatamente tabela_fn_lim099.csv
+- Ambiente: Windows 10, Python 3.12.3, numpy 2.5.4, pandas 3.0.6, scipy 1.18.1, statsmodels 0.15.0
+- Resultado — capas PNG limpas:
+  - Nenhuma tem p_max = 1 exato; o máximo é 0,9999999542
+  - Faixas: < 0,95: 74 · [0,95; 0,99): 4 · [0,99; 0,999): 2 · [0,999; 0,99999): 7 · ≥ 0,99999: 3
+  - FP por limiar: 0,95 → 16/90 (17,8%) · 0,99 → 12 (13,3%) · 0,999 → 10 (11,1%) ·
+    0,9999 → 6 (6,7%) · 1,0 estrito → 0
+  - Menor limiar com FP ≤ 5%: L > 0,9999734 pela taxa pontual (até 4 FP); L > 0,9999999542 para o
+    limite superior do IC ficar ≤ 5% (0 FP)
+  - Textura com 0,95: baixa 1 · média 6 · alta 9 (de 30 cada)
+- Resultado — JPEG limpas: 0 FP em todos os limiares; máximo 0,9286
+- Resultado — detecção das estego (agregado das 3 taxas):
+  - 0,95: FP PNG 17,8% · LSB 65,6% · DCT 71,9%
+  - L = 0,9999867 (menor limiar concreto com FP PNG ≤ 5%): FP PNG 4,4% · LSB 17,4% · DCT 3,7%
+  - L logo acima de 0,9999999542 (FP PNG 0): LSB 3,7% · DCT 0,0%
+- Conclusão: em sentido estrito existe limiar < 1 que zera o FP, porque nenhuma capa limpa chega a
+  p_max = 1. Mas esse limiar fica colado em 1, ajustado ao máximo desta amostra, e derruba a
+  detecção: levar o FP do PNG a ≤ 5% custa 48,1 p.p. de sensibilidade no LSB. As notas das capas
+  limpas e das estego se sobrepõem perto de 1, e por isso nenhum limiar separa as duas. O FP em PNG
+  não é um problema de calibração do limiar. Ele se concentra nas texturas média e alta
 
 ## Desvios
 (modelo: data · o que o protocolo previa · o que foi observado · o que foi adotado · quem aprovou)
