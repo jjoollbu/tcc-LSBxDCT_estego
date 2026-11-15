@@ -1,0 +1,4 @@
+taxa,metrica,p,p_bh,regra,n_pares,ambos,so_lsb,so_dct,nenhum,det_lsb,det_dct,mais_detectada,significativo_bh
+baixa,deteccao,2.4342560209333897e-05,7.302768062800169e-05,absoluta_128,90,33,32,6,19,0.72222222222222221,0.43333333333333335,lsb,True
+media,deteccao,1,1,absoluta_128,90,73,8,9,0,0.90000000000000002,0.91111111111111109,dct,False
+alta,deteccao,0.1795654296875,0.26934814453125,absoluta_128,90,76,4,10,0,0.88888888888888884,0.9555555555555556,dct,False

@@ -31,6 +31,8 @@ FORMATO = {"lsb": "png", "dct": "jpeg"}
 LIMIAR, LIMIAR_CALIBRACAO = 0.95, 0.99           # D-12 (vigente) e calibração pré-registrada
 N_PIXELS = 512 * 512
 SAIDA_PADRAO = RAIZ / "resultados" / "reanalise_pos_feedback"
+# pandas < 3 lê float do CSV com perda no último dígito; a partir do 3 o padrão já é exato (round-trip)
+CSV_FLOAT = {} if int(pd.__version__.split(".")[0]) >= 3 else {"float_precision": "round_trip"}
 
 
 def argumentos():
@@ -45,8 +47,8 @@ def argumentos():
 
 
 def ler_coleta(fonte):
-    res = pd.read_csv(fonte / "resultados.csv", dtype={"id": str}, float_precision="round_trip")
-    lim = pd.read_csv(fonte / "limpas.csv", dtype={"id": str}, float_precision="round_trip")
+    res = pd.read_csv(fonte / "resultados.csv", dtype={"id": str}, **CSV_FLOAT)
+    lim = pd.read_csv(fonte / "limpas.csv", dtype={"id": str}, **CSV_FLOAT)
     assert len(res) == 540 and not res.duplicated(["tecnica", "taxa", "id"]).any(), "resultados.csv inesperado"
     assert len(lim) == 180 and not lim.duplicated(["formato", "id"]).any(), "limpas.csv inesperado"
     cat = lim.drop_duplicates("id").set_index("id").categoria
@@ -150,6 +152,16 @@ def proveniencia(saida, nome, fonte, extra):
 def br(x, d=3):
     """Número com vírgula decimal."""
     return "nan" if x != x else f"{x:.{d}f}".replace(".", ",")
+
+
+def sci(x, d=1):
+    """Notação científica com vírgula decimal."""
+    return f"{x:.{d}e}".replace(".", ",")
+
+
+def pval(p):
+    """p-valor para tabela: '< 0,001' abaixo de 0,001; senão 3 casas."""
+    return "nan" if p != p else ("< 0,001" if p < 0.001 else br(p, 3))
 
 
 def pc(x, d=1):

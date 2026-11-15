@@ -35,3 +35,23 @@ def p_max(amostra: np.ndarray, passos: int = 100) -> float:
             if p == p:                             # descarta nan (janela pequena demais)
                 ps.append(p)
     return max(ps) if ps else float("nan")
+
+
+def p_max_absoluto(amostra: np.ndarray, passo: int = 256) -> float:
+    """Maior p-valor entre janelas acumuladas de tamanho absoluto: passo, 2·passo, ... amostras.
+
+    Análise de sensibilidade posterior à coleta (não substitui p_max, que segue sendo a regra
+    pré-registrada da D-12). Se o total não for múltiplo do passo, a amostra inteira entra como
+    última janela, para a janela de 100% estar sempre incluída. Mesma p_valor_janela e mesmo
+    descarte de janelas nan que p_max.
+    """
+    total = len(amostra)
+    tamanhos = list(range(passo, total + 1, passo))
+    if total > 0 and (not tamanhos or tamanhos[-1] != total):
+        tamanhos.append(total)
+    ps = []
+    for n in tamanhos:
+        p = p_valor_janela(amostra[:n])
+        if p == p:                                 # descarta nan (janela pequena demais)
+            ps.append(p)
+    return max(ps) if ps else float("nan")
