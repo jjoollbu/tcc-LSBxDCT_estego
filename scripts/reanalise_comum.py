@@ -125,21 +125,26 @@ def ambientes(fonte):
     return {"coleta": amb_coleta, "reanalise": amb_atual}
 
 
+def escrever(caminho, texto):
+    """Grava texto em UTF-8 com fim de linha LF (o mesmo que o Git guarda, eol=lf)."""
+    pathlib.Path(caminho).write_text(texto, encoding="utf-8", newline="\n")
+
+
 def proveniencia(saida, nome, fonte, extra):
     sha = lambda q: hashlib.sha256(q.read_bytes()).hexdigest()
+    sha_lf = lambda q: hashlib.sha256(q.read_bytes().replace(b"\r\n", b"\n")).hexdigest()   # = blob no Git (eol=lf)
     git = lambda *a: subprocess.run(["git", *a], cwd=RAIZ, capture_output=True, text=True).stdout.strip()
     prov = {"gerado_em": datetime.datetime.now(datetime.timezone.utc).isoformat(), "script": f"scripts/{nome}.py",
             "commit_repositorio": git("rev-parse", "HEAD"),
             "arvore_suja_src_scripts": bool(git("status", "--porcelain", "src", "scripts")),
             "nota_arvore": "script e saídas entram no mesmo commit; o código executado fica identificado pelos SHA-256 abaixo",
-            "sha256_codigo": {str(q.relative_to(RAIZ)).replace("\\", "/"): sha(q) for q in
+            "sha256_codigo_lf": {str(q.relative_to(RAIZ)).replace("\\", "/"): sha_lf(q) for q in
                               [RAIZ / "scripts" / f"{nome}.py", RAIZ / "scripts" / "reanalise_comum.py",
                                *sorted((RAIZ / "src").glob("*.py"))]},
             "fonte": str(fonte), "sha256_resultados.csv": sha(fonte / "resultados.csv"),
             "sha256_limpas.csv": sha(fonte / "limpas.csv"), "commit_coleta": "a8ef486b9ca8c77c2e7f0efc53856d5527879d8f",
             "ambientes": ambientes(fonte), **extra}
-    (saida / f"proveniencia_{nome}.json").write_text(json.dumps(prov, indent=2, ensure_ascii=False, default=str) + "\n",
-                                                     encoding="utf-8")
+    escrever(saida / f"proveniencia_{nome}.json", json.dumps(prov, indent=2, ensure_ascii=False, default=str) + "\n")
 
 
 def br(x, d=3):

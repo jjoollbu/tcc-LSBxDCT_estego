@@ -127,7 +127,7 @@ md += ["", "## Leitura", "",
        f"- Comparação: nas 74 PNG sem FP, k = 1% em {ts.k_max_eq_1}; nas 90 JPEG, k = 1% em {tj.k_max_eq_1} "
        f"(k mediano {g_(tj.k_max_mediana)}%). A janela de 1% tem {n1_png} pixels no PNG (as ~5 primeiras linhas da imagem) e "
        f"de {n1_jpg.min()} a {n1_jpg.max()} coeficientes elegíveis no JPEG.", ""]
-(saida / "diag_fp_janelas.md").write_text("\n".join(md) + "\n", encoding="utf-8")
+rc.escrever(saida / "diag_fp_janelas.md", "\n".join(md) + "\n")
 rc.proveniencia(saida, "diag_fp_janelas", fonte, {
     "validacao_p_max": conf, "regra_k_max": "primeira janela k (1..100) cujo p é igual ao máximo",
     "limiar": rc.LIMIAR, "regra_so_100": "FP se p da janela de 100% >= 0,95"})
