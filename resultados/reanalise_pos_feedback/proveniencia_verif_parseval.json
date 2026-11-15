@@ -1,0 +1,88 @@
+{
+  "gerado_em": "2026-11-15T14:38:01.472761+00:00",
+  "script": "scripts/verif_parseval.py",
+  "commit_repositorio": "ca7811a6d3229a7d6082f752fff1e008bdadb270",
+  "arvore_suja_src_scripts": true,
+  "nota_arvore": "script e saídas entram no mesmo commit; o código executado fica identificado pelos SHA-256 abaixo",
+  "sha256_codigo_lf": {
+    "scripts/verif_parseval.py": "9e77a7a77359d97f50c012e734071e03600b76365b6530036d53eaaade4a4171",
+    "scripts/reanalise_comum.py": "20ae624bbdfe7bb6d5f39089685b1f4d102073bdbd83bf5527faccc45864af3e",
+    "src/custo.py": "d56aa0fd482f68d58cfa89c3a89f326019e78ccd482b1a56b0f50a164807ffd9",
+    "src/dct.py": "eeed0654175a43d087e295ac0cb92652bd04039ff35b5f6d5322ace9f0125820",
+    "src/estatistica.py": "5760bcbde442e073e63418280273663ae13b7705393c207f927bf6806d1ab3f6",
+    "src/lsb.py": "8b23bdb2d7d40e96e31591a3820a250b433a0e7b76b29ac6511cf916d6620ee1",
+    "src/qualidade.py": "804553e048c4130652cc096df1cc6d6d5185dde22e9bf4717a9c873690c0c582",
+    "src/quiquadrado.py": "2aa01830c941909f1c1d9e8ffb254178eb5eda7d7172d9bd4f13af148a711444"
+  },
+  "fonte": "C:\\Faculdade TCC\\Resultados",
+  "sha256_resultados.csv": "12da2baf74be36774113af828197238d6f27df42147fdc3ac6c27a077f980022",
+  "sha256_limpas.csv": "67b4112daf792b855f3c5a219263fe032b75b17b94a1c623c629bc18b7b4d3d4",
+  "commit_coleta": "a8ef486b9ca8c77c2e7f0efc53856d5527879d8f",
+  "ambientes": {
+    "coleta": {
+      "sistema": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+      "python": "3.10.12",
+      "bibliotecas": {
+        "numpy": "2.2.6",
+        "pandas": "2.3.3",
+        "scipy": "1.15.3",
+        "scikit-image": "0.25.2",
+        "statsmodels": "0.15.0",
+        "jpeglib": "1.0.2",
+        "Pillow": "12.3.0",
+        "psutil": "7.2.2"
+      },
+      "commit": "a8ef486b9ca8c77c2e7f0efc53856d5527879d8f"
+    },
+    "reanalise": {
+      "sistema": "Windows-10-10.0.19045-SP0",
+      "python": "3.12.3",
+      "bibliotecas": {
+        "numpy": "2.5.4",
+        "pandas": "3.1.1",
+        "scipy": "1.18.1",
+        "statsmodels": "0.15.0",
+        "jpeglib": "1.0.2",
+        "Pillow": "12.3.0"
+      }
+    }
+  },
+  "tabela_q_unica_nas_90_capas": true,
+  "q_banda_zigue_zague": [
+    2,
+    2,
+    2,
+    2,
+    2,
+    4,
+    3,
+    2,
+    2,
+    2,
+    2,
+    5,
+    4,
+    4,
+    3,
+    4,
+    6,
+    5,
+    6,
+    6,
+    6,
+    5,
+    6,
+    6,
+    6,
+    7
+  ],
+  "orientacao_qt_idct_erro_medio": {
+    "qt": 0.01425933837890625,
+    "qt_transposta": 0.4680976867675781
+  },
+  "estego_sha256_confere": "270/270",
+  "mse_recalculado_confere": true,
+  "n_pixels": 262144,
+  "parseval_numerico_erro_rel_max": 2.424395625441926e-15,
+  "modelo_arredondado": "IDCT ortonormal 8x8 em float (scipy.fft.idctn, norm='ortho') + 128, np.round e corte em 0-255; não é a IDCT inteira da libjpeg"
+}
