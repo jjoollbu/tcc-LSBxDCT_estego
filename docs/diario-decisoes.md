@@ -284,6 +284,82 @@ Em caso de conflito com os arquivos 04, 05 e 08, vale este diário.
   limpas e das estego se sobrepõem perto de 1, e por isso nenhum limiar separa as duas. O FP em PNG
   não é um problema de calibração do limiar. Ele se concentra nas texturas média e alta
 
+## Reanálises pós-Feedback (nov/2026)
+- Data: 15/11/2026 · Responsável: Jonmar · Registro posterior à execução do experimento
+- Status: análises de sensibilidade feitas depois da coleta. Não alteram resultados.csv, limpas.csv
+  nem src/quiquadrado.p_max; **os resultados pré-registrados (D-12, janelas de 1% a 100%, limiar
+  0,95) continuam sendo os principais**
+- Motivo: parecer externo sobre (1) as janelas de 1% do qui-quadrado, ligadas ao FP em PNG; (2) a
+  distorção da DCT, que deveria ser explicada pelo teorema de Parseval e pelos passos de quantização;
+  (3) a AUC exploratória da Tabela 6, apresentada sem intervalo de confiança; (4) o objetivo
+  específico (e), que prevê a análise de histograma dos coeficientes DCT
+- Fonte: resultados.csv e limpas.csv da coleta (commit a8ef486), os mesmos SHA-256 das seções
+  anteriores (12da2baf… e 67b4112d…), lidos sem alteração
+- Saída: resultados/reanalise_pos_feedback/ (CSV, .md e proveniencia_*.json por script; RESUMO.md
+  com os números principais). Os scripts recusam gravar na pasta da coleta
+- Scripts (funções comuns em scripts/reanalise_comum.py):
+  - scripts/diag_fp_janelas.py: p de cada uma das 100 janelas nas 180 capas limpas; janela do
+    máximo, p na janela de 100% e na de 1%; FP se só a janela de 100% fosse usada
+  - scripts/reanalise_janelas_absolutas.py: nova função src/quiquadrado.p_max_absoluto (janelas
+    acumuladas de 128, 256 ou 512 amostras até o total; p_max não foi alterada); sensibilidade, FP,
+    McNemar exato pareado com BH e pares discordantes no formato de tabela_deteccao.csv
+  - scripts/verif_parseval.py: MSE previsto Σ(Δ·q)²/262144 e esperado 0,5·Σq²/262144 com a tabela
+    de quantização do Y de cada capa, contra o mse medido; E[q²] × razão MSE_DCT/MSE_LSB; textura
+  - scripts/auc_bootstrap.py: AUC da Tabela 6 com IC 95% por bootstrap estratificado (2.000
+    reamostragens, percentil, semente = 5º fluxo da SeedSequence(2026), independente dos 4 de
+    sementes.py), também para p_max_absoluto
+  - scripts/histograma_dct.py: histograma dos coeficientes elegíveis da banda (−20 a 20, sem 0 e 1)
+    e assimetria dos pares 2k/2k+1, capa × estego por taxa; figura histograma_dct.png
+- Preparação: dataset/capas/ não existia neste checkout. Os 120 .pgm sorteados foram copiados da
+  BOSSBase local para dataset/bossbase/ (SHA-256 = sha256_original do manifest, 120/120) e as capas
+  foram geradas com scripts/preparar_capas.py. JPEG: SHA-256 igual ao manifest (120/120) e ao
+  sha256_capa de resultados.csv (90/90). PNG: SHA-256 igual ao manifest (120/120), mas diferente do
+  sha256_capa de resultados.csv (0/90), porque os bytes da compressão zlib diferem entre o Windows e
+  o Linux da coleta (também com Pillow 12.3.0); os pixels são idênticos ao .pgm. No manifest.csv
+  regravado pelo script só a coluna gradiente mudou, a partir do 17º dígito (diferença máxima
+  9,7e−17, formatação de float do pandas mais novo); o arquivo versionado foi restaurado.
+  ordem_execucao.csv não existe neste checkout; nenhuma reanálise depende dele (as 540 combinações
+  vêm de resultados.csv)
+- Validação da regeneração (obrigatória antes de usar p_max_absoluto):
+  - Estego idênticas bit a bit: DCT com o mesmo SHA-256 de resultados.csv (270/270); LSB com o mesmo
+    MSE exato (270/270); mse da DCT recalculado (JPEG × JPEG decodificados) igual à coluna mse
+  - p_max com a função original: 539/540 estego idênticos a resultados.csv e 540/540 até 1 ULP
+    (diferença absoluta máxima 3,5e−18: LSB baixa 9333, 0,026055418872759122 na coleta ×
+    0,026055418872759126); 179/180 capas limpas idênticas a limpas.csv e 180/180 até 1 ULP
+    (máxima 1,1e−16: JPEG 9020, 0,928568206741158 × 0,9285682067411579). Nenhuma decisão muda em
+    0,95 nem em 0,99; a regra original reproduz tabela_deteccao.csv
+  - Critério aprovado pelo autor em 15/11/2026: aceitar igualdade exata ou diferença ≤ 1 ULP, com
+    todas as decisões em 0,95 e 0,99 idênticas (o script para em qualquer outro caso). A diferença
+    vem do chi2.sf na biblioteca matemática de cada sistema; um teste com numpy 2.2.6 e scipy 1.15.3
+    no Windows reproduziu menos (510/540), então foi mantido o ambiente do requirements.txt
+  - Ambiente da coleta: Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.35, Python
+    3.10.12, numpy 2.2.6, scipy 1.15.3, pandas 2.3.3, statsmodels 0.15.0, jpeglib 1.0.2, Pillow 12.3.0
+  - Ambiente das reanálises: Windows 10 (10.0.19045), Python 3.12.3, numpy 2.5.4, scipy 1.18.1,
+    pandas 3.1.1, statsmodels 0.15.0, jpeglib 1.0.2, Pillow 12.3.0, matplotlib 3.11.2
+- Resultado — janelas e FP em PNG: nos 16 FP o máximo saiu na janela de 1% em 8 casos, em ≤ 5% em
+  12 e no máximo em 14%; a janela de 1% (2.621 pixels) já dá p ≥ 0,95 nas 16 e em nenhuma das 74 PNG
+  sem FP. Só com a janela de 100%: 0/90 FP no PNG e 0/90 no JPEG
+- Resultado — janelas absolutas (FP PNG · FP JPEG · sensibilidade LSB/DCT na taxa baixa):
+  - Original: 16/90 · 0/90 · 31,1% / 35,6%
+  - Passo 128: 25/90 · 4/90 · 72,2% / 43,3%
+  - Passo 256: 23/90 · 2/90 · 68,9% / 40,0%
+  - Passo 512: 21/90 · 2/90 · 62,2% / 30,0%
+  - McNemar: na taxa baixa, LSB mais detectado nos três passos (passo 256: 32 × 6; p_BH < 0,001);
+    nas taxas média e alta, nada significativo em nenhuma regra
+- Resultado — Parseval: MSE medido/previsto com mediana 1,21 (r = 0,990); com arredondamento e corte
+  dos pixels, 1,001 (r = 0,999997). E[q²] 10,2 · 12,3 · 12,9 contra razão MSE_DCT/MSE_LSB de
+  13,4 · 14,3 · 14,5. Na taxa alta, PSNR da DCT 1,03 dB menor na textura alta (modelo: 1,04 dB)
+- Resultado — AUC [IC 95%], regra original: LSB 0,618 [0,530; 0,698] · 0,877 [0,821; 0,930] ·
+  0,893 [0,839; 0,941]; DCT 0,951 [0,911; 0,981] · 0,999 [0,997; 1,000] · 0,9996 [0,999; 1,000].
+  IC de LSB e DCT sem sobreposição em todas as taxas e regras
+- Resultado — histograma: assimetria dos pares nas posições usadas cai de 0,498/0,365/0,329 para
+  0,064/0,027/0,021 (taxas baixa/média/alta; estego < capa em 89, 90 e 90 de 90)
+- Conclusão: o FP do PNG está ligado às primeiras janelas, mas janelas absolutas pequenas não o
+  resolvem (o FP aumenta nos dois formatos), e a comparação LSB × DCT na taxa baixa depende do
+  tamanho das janelas; isso vai para as limitações. A distorção da DCT é explicada pelos passos de
+  quantização (Parseval) mais o arredondamento na decodificação. Nada aqui substitui os resultados
+  pré-registrados
+
 ## Desvios
 (modelo: data · o que o protocolo previa · o que foi observado · o que foi adotado · quem aprovou)
 
