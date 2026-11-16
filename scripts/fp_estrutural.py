@@ -85,8 +85,8 @@ for f in FORMATOS:
                            **wilson((h.p_max >= L).sum(), len(h))})
 
     # 3. Menor limiar < 1 que atende cada critério. Com p ordenado decrescente (p_(1) ≥ p_(2) ≥ ...),
-    # marcar no máximo k capas exige L > p_(k+1); o menor L é então qualquer valor acima de p_(k+1),
-    # e L = p_(k) já marca exatamente k (sem empates). k = maior nº de FP que atende o critério.
+    # marcar no máximo k capas exige L > p_(k+1); o menor L é o primeiro float acima de p_(k+1)
+    # (item 5). k = maior nº de FP que atende o critério.
     desc = np.sort(p)[::-1]
     for c in CRITERIOS:
         k = max(j for j in range(n + 1) if aceita(wilson(j, n))[f"aceitavel_{c}"])
@@ -106,14 +106,16 @@ for f in FORMATOS:
 
 # 5. Custo em detecção. O limiar da D-12 é um só para os dois formatos, então os dois são avaliados
 # nos mesmos L: os candidatos e os limiares mínimos do PNG (item 3), cada um no menor valor concreto
-# que atende o critério: L = p_(k) (marca exatamente k capas limpas) ou, para k = 0, o primeiro
-# float acima do p_max máximo. p_max nan nas estego => não detectado, como na coleta.
+# que atende o critério: L = nextafter(p_(k+1), +inf), o primeiro float acima de p_(k+1), que marca
+# no máximo k capas limpas (k = 0: o primeiro float acima do p_max máximo). Usar L = p_(k) também
+# marca k limpas, mas não é o mínimo: deixa de detectar as estego com p_max em (p_(k+1); p_(k)).
+# p_max nan nas estego => não detectado, como na coleta.
 desc_png = np.sort(lim[lim.formato == "png"].p_max.to_numpy())[::-1]
 CUSTO = [(fl(L), L) for L in LIMIARES]
 for c in CRITERIOS:
     k = minimos[("png", c)]["k_max"]
     if desc_png[k] >= 0.95:                     # só faz sentido se o critério exige subir acima de 0,95
-        L = float(desc_png[k - 1]) if k > 0 else float(np.nextafter(desc_png[0], np.inf))
+        L = float(np.nextafter(desc_png[k], np.inf))
         CUSTO.append((f"mínimo PNG ({c})", L))
 CUSTO.sort(key=lambda x: x[1])
 for f in FORMATOS:
@@ -165,7 +167,7 @@ prov = {"gerado_em": datetime.datetime.now(datetime.timezone.utc).isoformat(), "
         "n_capas": lim.groupby("formato").size().to_dict(),
         "n_estego": res.groupby("formato").size().to_dict(), "p_max_nan_estego": int(res.p_max.isna().sum()),
         "limiares_custo": [[rot, L] for rot, L in CUSTO],
-        "regra_limiar_minimo_concreto": "L = p_(k) (k-ésimo maior p_max PNG limpo) ou, para k = 0, nextafter(max, +inf)",
+        "regra_limiar_minimo_concreto": "L = nextafter(p_(k+1), +inf), p_(k+1) = (k+1)-ésimo maior p_max PNG limpo (k = 0: nextafter(max, +inf))",
         "regra_deteccao": "detectado se p_max >= L; nan => não detectado",
         "ic_agregado": "agregado = 270 estego (3 taxas × 90 imagens) tratadas como independentes (aproximação)",
         "confere_reanalise_limiar": confere,
