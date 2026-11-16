@@ -8,7 +8,7 @@ Regra: FP se p_max ≥ L (D-12). IC 95% de Wilson. Aceitável = FP ≤ 5%, avali
 - **Onde o FP se concentra (PNG):** das 16 capas limpas marcadas com 0,95, 10 têm p_max ≥ 0,999 e 3 estão em ≥ 0,99999; o máximo é 0,9999999542. Capas com p_max exatamente 1,0: 0.
 - **Menor limiar < 1 que resolve (PNG):** pela estimativa pontual, L > 0,9999733918 (1 − L ≈ 2,7e-05, até 4 FP); para o limite superior do IC ficar ≤ 5% (0 FP), L > 0,9999999542 (1 − L ≈ 4,6e-08). Entre os candidatos, atingem ≤ 5% (ponto): 1,0 (estrito) (6/90 ainda marcadas com 0,9999). Existe L < 1 em sentido estrito, mas só colado em 1 e ajustado ao máximo desta amostra; capas com p_max = 1,0 exato que nenhum L < 1 remove: 0.
 - **Textura (PNG, 0,95):** baixa 1, media 6, alta 9 de 30 cada.
-- **Custo em detecção:** 0,95 — FP PNG 17,8%, sensibilidade LSB 65,6% e DCT 71,9%; mínimo PNG (ic_inf) — FP PNG 8,9%, sensibilidade LSB 32,2% e DCT 13,3%; mínimo PNG (ponto) — FP PNG 4,4%, sensibilidade LSB 17,4% e DCT 3,7%; mínimo PNG (ic_sup) — FP PNG 0,0%, sensibilidade LSB 3,7% e DCT 0,0%. Para levar o FP do PNG a ≤ 5% (ponto), a sensibilidade agregada do LSB cai 48,1 p.p. em relação a 0,95: as caudas de p_max de limpas e estego se sobrepõem perto de 1.
+- **Custo em detecção:** 0,95 — FP PNG 17,8%, sensibilidade LSB 65,6% e DCT 71,9%; mínimo PNG (ic_inf) — FP PNG 8,9%, sensibilidade LSB 33,3% e DCT 13,3%; mínimo PNG (ponto) — FP PNG 4,4%, sensibilidade LSB 20,7% e DCT 4,4%; mínimo PNG (ic_sup) — FP PNG 0,0%, sensibilidade LSB 3,7% e DCT 0,0%. Para levar o FP do PNG a ≤ 5% (ponto), a sensibilidade agregada do LSB cai 44,8 p.p. em relação a 0,95: as caudas de p_max de limpas e estego se sobrepõem perto de 1.
 - **JPEG (contraste):** 0 FP em todos os limiares; p_max máximo 0,928568.
 
 ## PNG
@@ -64,10 +64,10 @@ Mesmos limiares nos dois formatos (a D-12 usa um limiar só). "mínimo PNG" = me
 | 0,95 | 0,9500000000 | 16/90 (17,8%) | 177/270 — 65,6% [59,7%; 71,0%] | 31,1% | 82,2% | 83,3% |
 | 0,99 | 0,9900000000 | 12/90 (13,3%) | 143/270 — 53,0% [47,0%; 58,8%] | 21,1% | 65,6% | 72,2% |
 | 0,999 | 0,9990000000 | 10/90 (11,1%) | 106/270 — 39,3% [33,6%; 45,2%] | 14,4% | 46,7% | 56,7% |
-| mínimo PNG (ic_inf) | 0,9996822702220352 | 8/90 (8,9%) | 87/270 — 32,2% [26,9%; 38,0%] | 8,9% | 37,8% | 50,0% |
+| mínimo PNG (ic_inf) | 0,9996645805066218 | 8/90 (8,9%) | 90/270 — 33,3% [28,0%; 39,2%] | 10,0% | 37,8% | 52,2% |
 | 0,9999 | 0,9999000000 | 6/90 (6,7%) | 74/270 — 27,4% [22,4%; 33,0%] | 5,6% | 33,3% | 43,3% |
-| mínimo PNG (ponto) | 0,9999867260976176 | 4/90 (4,4%) | 47/270 — 17,4% [13,4%; 22,4%] | 4,4% | 20,0% | 27,8% |
-| mínimo PNG (ic_sup) | 0,9999999542096293 | 0/90 (0,0%) | 10/270 — 3,7% [2,0%; 6,7%] | 1,1% | 3,3% | 6,7% |
+| mínimo PNG (ponto) | 0,9999733918067893 | 4/90 (4,4%) | 56/270 — 20,7% [16,3%; 26,0%] | 4,4% | 23,3% | 34,4% |
+| mínimo PNG (ic_sup) | 0,9999999542096294 | 0/90 (0,0%) | 10/270 — 3,7% [2,0%; 6,7%] | 1,1% | 3,3% | 6,7% |
 | 1,0 (estrito) | 1,0000000000 | 0/90 (0,0%) | 0/270 — 0,0% [0,0%; 1,4%] | 0,0% | 0,0% | 0,0% |
 
 ## JPEG
@@ -123,10 +123,10 @@ Mesmos limiares nos dois formatos (a D-12 usa um limiar só). "mínimo PNG" = me
 | 0,95 | 0,9500000000 | 0/90 (0,0%) | 194/270 — 71,9% [66,2%; 76,9%] | 35,6% | 86,7% | 93,3% |
 | 0,99 | 0,9900000000 | 0/90 (0,0%) | 134/270 — 49,6% [43,7%; 55,6%] | 10,0% | 62,2% | 76,7% |
 | 0,999 | 0,9990000000 | 0/90 (0,0%) | 60/270 — 22,2% [17,7%; 27,6%] | 0,0% | 23,3% | 43,3% |
-| mínimo PNG (ic_inf) | 0,9996822702220352 | 0/90 (0,0%) | 36/270 — 13,3% [9,8%; 17,9%] | 0,0% | 13,3% | 26,7% |
+| mínimo PNG (ic_inf) | 0,9996645805066218 | 0/90 (0,0%) | 36/270 — 13,3% [9,8%; 17,9%] | 0,0% | 13,3% | 26,7% |
 | 0,9999 | 0,9999000000 | 0/90 (0,0%) | 23/270 — 8,5% [5,7%; 12,5%] | 0,0% | 7,8% | 17,8% |
-| mínimo PNG (ponto) | 0,9999867260976176 | 0/90 (0,0%) | 10/270 — 3,7% [2,0%; 6,7%] | 0,0% | 4,4% | 6,7% |
-| mínimo PNG (ic_sup) | 0,9999999542096293 | 0/90 (0,0%) | 0/270 — 0,0% [0,0%; 1,4%] | 0,0% | 0,0% | 0,0% |
+| mínimo PNG (ponto) | 0,9999733918067893 | 0/90 (0,0%) | 12/270 — 4,4% [2,6%; 7,6%] | 0,0% | 5,6% | 7,8% |
+| mínimo PNG (ic_sup) | 0,9999999542096294 | 0/90 (0,0%) | 0/270 — 0,0% [0,0%; 1,4%] | 0,0% | 0,0% | 0,0% |
 | 1,0 (estrito) | 1,0000000000 | 0/90 (0,0%) | 0/270 — 0,0% [0,0%; 1,4%] | 0,0% | 0,0% | 0,0% |
 
 ## Conferência

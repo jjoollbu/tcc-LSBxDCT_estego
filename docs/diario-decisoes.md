@@ -276,13 +276,24 @@ Em caso de conflito com os arquivos 04, 05 e 08, vale este diário.
 - Resultado — JPEG limpas: 0 FP em todos os limiares; máximo 0,9286
 - Resultado — detecção das estego (agregado das 3 taxas):
   - 0,95: FP PNG 17,8% · LSB 65,6% · DCT 71,9%
-  - L = 0,9999867 (menor limiar concreto com FP PNG ≤ 5%): FP PNG 4,4% · LSB 17,4% · DCT 3,7%
+  - L logo acima de 0,9999733918 (menor limiar concreto com FP PNG ≤ 5%): FP PNG 4,4% (4/90) ·
+    LSB 20,7% · DCT 4,4%
   - L logo acima de 0,9999999542 (FP PNG 0): LSB 3,7% · DCT 0,0%
 - Conclusão: em sentido estrito existe limiar < 1 que zera o FP, porque nenhuma capa limpa chega a
   p_max = 1. Mas esse limiar fica colado em 1, ajustado ao máximo desta amostra, e derruba a
-  detecção: levar o FP do PNG a ≤ 5% custa 48,1 p.p. de sensibilidade no LSB. As notas das capas
+  detecção: levar o FP do PNG a ≤ 5% custa 44,8 p.p. de sensibilidade no LSB. As notas das capas
   limpas e das estego se sobrepõem perto de 1, e por isso nenhum limiar separa as duas. O FP em PNG
   não é um problema de calibração do limiar. Ele se concentra nas texturas média e alta
+- Correção em 16/11/2026: a tabela de custo avaliava o "mínimo PNG (ponto)" em L = 0,9999867261
+  (p_max da 4ª capa PNG limpa), que também marca 4 capas mas não é o menor limiar com ≤ 4 FP; o menor
+  é L > 0,9999733918 (p_max da 5ª). A versão anterior registrava LSB 17,4%, DCT 3,7% e queda de
+  48,1 p.p.; com o limiar mínimo ficam LSB 20,7%, DCT 4,4% e 44,8 p.p. (FP PNG segue 4/90). A mesma
+  regra foi aplicada à linha "mínimo PNG (ic_inf)", que passou de L = 0,9996822702 para logo acima
+  de 0,9996645805 (FP PNG 8/90; LSB 32,2% → 33,3%; DCT 13,3% sem mudança). Saídas regeneradas com
+  scripts/fp_estrutural.py (commit 2ed7538), mesma fonte e mesmos SHA-256. A regeneração usou
+  pandas 3.1.1 (antes 3.0.6), que lê o p_max de limpas.csv exatamente igual ao float() do Python
+  (180/180); a leitura com 3.0.6 diferia em até 1 ULP em alguns valores (ex.: máximo 0,99999995420962917
+  → 0,99999995420962928), o que muda só os últimos dígitos no CSV e nenhuma contagem
 
 ## Reanálises pós-Feedback (nov/2026)
 - Data: 15/11/2026 · Responsável: Jonmar · Registro posterior à execução do experimento
@@ -372,3 +383,42 @@ Em caso de conflito com os arquivos 04, 05 e 08, vale este diário.
 - Garantia: a VM instala a mesma versão do NumPy; a T1.3 confirma a reprodução idêntica;
   os .bin versionados no Git e os SHA-256 acima são a referência definitiva
 - Impacto: nenhum nas medições
+
+## DESVIO-02 — Limiar do detector mantido em 0,95 apesar da condição de calibração da D-12
+- Data: 30/10/2026 · Responsável: Jonmar · Registro posterior à execução do experimento
+- Previsto: a D-12 fixou o limiar em p_max >= 0,95 e pré-registrou uma única calibração — mais de
+  3 falsos positivos em 30 no piloto acionaria o limiar 0,99
+- Observado: o piloto (commit baf762b, 13/10/2026) acusou 8 de 30 capas PNG limpas, acima do gatilho.
+  A condição de calibração foi, portanto, atingida
+- Adotado: o limiar foi mantido em 0,95 na execução do experimento (commit a8ef486, 29/10/2026), sem
+  que a calibração fosse acionada. O 0,99 entra no artigo como análise de sensibilidade, não como
+  análise principal
+- Motivo: o resultado do piloto não foi conferido contra a regra da D-12 antes da coleta; o
+  acionamento só foi constatado depois da execução. A troca de erros observada depois (FP 17,8% →
+  13,3%, FN maiores nas duas técnicas) é consequência medida, não justificativa.
+- Correção em 16/11/2026: versão anterior (30/10) apresentava a troca de erros como motivo;
+  substituída por ser justificativa posterior aos dados.
+- Impacto: a conclusão comparativa não muda — o teste de McNemar não encontra diferença significativa
+  entre as técnicas em nenhuma taxa sob nenhum dos dois limiares (p ajustado >= 0,19 com 0,95;
+  p >= 0,06 com 0,99). Muda a estimativa pontual: com 0,95 a DCT é a mais detectada nas três taxas
+  (pares discordantes 9 x 13, 11 x 15 e 5 x 14); com 0,99 a direção se inverte na taxa baixa
+  (17 x 7). Por isso o artigo não sustenta a comparação em ponto de corte fixo e relata também a
+  área sob a curva ROC, que independe de limiar: 0,618, 0,877 e 0,893 para o LSB e 0,951, 0,999 e
+  1,000 para a DCT
+- Onde aparece no texto: Seções 4.4 (análise de sensibilidade ao limiar) e 4.5 (limitações)
+
+## DESVIO-03 — Medições de desempenho fora da máquina prevista na D-20
+- Data: 30/10/2026 · Responsável: Jonmar · Registro posterior à execução do experimento
+- Previsto: D-20 — VM local dedicada (Ubuntu 24.04 LTS), vCPUs e RAM fixas, 1 thread, sem rede
+- Observado/adotado: a coleta rodou em contêiner Docker sobre WSL2, em estação com Intel Core
+  i5-12450H (6 núcleos físicos, 12 lógicos) e 7,62 GB de RAM, Python 3.10.12, conforme o
+  ambiente.json gerado em 29/10/2026. O governador de frequência e o modo turbo não foram fixados
+- Motivo: a VM da T0.4 não ficou disponível dentro do prazo da coleta
+- Garantia: a ordem de execução intercalou as técnicas (264 alternâncias, no máximo 11 combinações
+  consecutivas da mesma técnica) e nenhuma deriva temporal relevante foi observada (|rho de Spearman|
+  <= 0,23 entre a posição na sequência e o tempo medido). O coeficiente de variação entre as 30
+  repetições de cada imagem ficou em 2,1% a 2,7% na DCT e 6,2% a 12,0% no LSB
+- Impacto: os tempos absolutos valem apenas para esse ambiente; a comparação válida é a razão entre
+  as técnicas, medidas sob condições idênticas. O i5-12450H tem núcleos híbridos, o que, somado ao
+  turbo não fixado, é limitação declarada
+- Onde aparece no texto: Seções 3.2.3 (ambiente efetivo) e 4.5 (limitações)
